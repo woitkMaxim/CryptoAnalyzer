@@ -1,29 +1,36 @@
 package action;
 
+import constants.Alphabet;
+import constants.Message;
+
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.util.Scanner;
-
-import static constants.Message.ENTER_THE_KEY;
 
 public class Encrypter {
 
-    private static final String src = "text/text.txt";
-    private static final String dest = "text/encryptedText.txt";
 
-    public static void run() {
+    public Encrypter() {
+        System.out.println(Message.DIRECTORY_TO_ENCRYPT);
+        String fileName = InputCheck.directoryCheck();
+        System.out.println(Message.DIRECTORY_RESULT);
+        String resultFileName = InputCheck.directoryCheck();
+        Encrypter.run(fileName, resultFileName);
+    }
 
-        Scanner scanner = new Scanner(System.in);
-        System.out.println(ENTER_THE_KEY);
-        int key = scanner.nextInt();
-        try (FileReader reader = new FileReader(src);
-             FileWriter writer = new FileWriter(dest)) {
+    private static void run(String fileName, String resultFileName) {
+
+        System.out.println(Message.ENTER_THE_KEY);
+        int key = InputCheck.keyCheck();
+        try (FileReader reader = new FileReader(fileName);
+             FileWriter writer = new FileWriter(resultFileName)) {
             while (reader.ready()) {
-                int symbol = reader.read();
-                int symbolPosition = symbol - 'а';
-                if (symbol >= 'а' && symbol <= 'я') {
-                    int newSymbol = (symbolPosition + key) % 30 + 'а';
-                    writer.write(newSymbol);
+                char symbol = (char)reader.read();
+                if (Alphabet.ALPHABET.contains(symbol)) {
+                    if (Alphabet.ALPHABET.indexOf(symbol) + key >= Alphabet.ALPHABET.size()) {
+                        writer.write(Alphabet.ALPHABET.get(Alphabet.ALPHABET.indexOf(symbol) + key - Alphabet.ALPHABET.size()));
+                    } else {
+                        writer.write(Alphabet.ALPHABET.get(Alphabet.ALPHABET.indexOf(symbol) + key));
+                    }
                 } else {
                     writer.write(symbol);
                 }
